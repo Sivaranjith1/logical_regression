@@ -9,7 +9,7 @@ class LogisticRegression:
     def __init__(self, lr, num_of_weights):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
-        self.weights = np.random.rand(num_of_weights, 1)
+        self.weights = np.random.rand(num_of_weights + 1, 1)
         self.lr = lr #Learning rate
         self.num_of_weights = num_of_weights
         
@@ -24,15 +24,16 @@ class LogisticRegression:
                 m binary 0.0/1.0 labels
         """
         for index, row in X.iterrows():
-            np_row = row.to_numpy()
+            np_row = np.append(row.to_numpy(), [-1]) #Add bias of -1
             np_y = np.array([y[index]])
 
-            for i in range(self.num_of_weights):
+            for i in range(self.num_of_weights + 1):
                 self.weights[i] += self.lr*np.matmul((np_y - self.predict_single(row)), [np_row[i]])
             
             #self.weights = self.weights + self.lr*np.matmul((np_y - self.predict(row).to_numpy()), np_row)
     def predict_single(self, X):
-        return sigmoid(np.matmul(self.weights.transpose(), X.to_numpy()))
+        np_row = np.append(X.to_numpy(), [-1]) #Add bias of -1
+        return sigmoid(np.matmul(self.weights.transpose(), np_row))
 
     def predict(self, X: pd.DataFrame):
         """
@@ -50,7 +51,8 @@ class LogisticRegression:
         """
         output = []
         for index, row in X.iterrows():
-            output.append(sigmoid(np.matmul(self.weights.transpose(), row.to_numpy()))[0])
+            np_row = np.append(row.to_numpy(), [-1]) #Add bias of -1
+            output.append(sigmoid(np.matmul(self.weights.transpose(), np_row))[0])
         return np.array(output)
         
 
