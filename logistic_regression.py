@@ -7,11 +7,9 @@ import pandas as pd
 class LogisticRegression:
     
     def __init__(self, lr, num_of_weights):
-        # NOTE: Feel free add any hyperparameters 
-        # (with defaults) as you see fit
-        self.weights = np.random.rand(num_of_weights + 1, 1)
+        self.weights = np.random.rand(num_of_weights + 1, 1) #numpy array with the weights for the input and bias
         self.lr = lr #Learning rate
-        self.num_of_weights = num_of_weights
+        self.num_of_weights = num_of_weights #number of input variables
         
     def fit(self, X: pd.DataFrame, y):
         """
@@ -25,15 +23,28 @@ class LogisticRegression:
         """
         for index, row in X.iterrows():
             np_row = np.append(row.to_numpy(), [-1]) #Add bias of -1
-            np_y = np.array([y[index]])
+            np_y = np.array([y[index]]) #get the fitting row in input data
 
-            for i in range(self.num_of_weights + 1):
-                self.weights[i] += self.lr*np.matmul((np_y - self.predict_single(row)), [np_row[i]])
+            for i in range(self.num_of_weights + 1): #for each input in the row update the corrosponding weight
+                self.weights[i] += self.lr*np.matmul((np_y - self.predict_single(row)), [np_row[i]]) #perform gradient ascend
             
-            #self.weights = self.weights + self.lr*np.matmul((np_y - self.predict(row).to_numpy()), np_row)
+
     def predict_single(self, X):
+        """
+        Generates predictions
+        
+        Note: should be called after .fit()
+        
+        Args:
+            X (array<m,n>): a matrix of floats with 
+                m rows (#samples) and n columns (#features)
+            
+        Returns:
+            A length m array of floats in the range [0, 1]
+            with probability-like predictions
+        """
         np_row = np.append(X.to_numpy(), [-1]) #Add bias of -1
-        return sigmoid(np.matmul(self.weights.transpose(), np_row))
+        return sigmoid(np.matmul(self.weights.transpose(), np_row)) #multiply with weights and perform sigmoid function
 
     def predict(self, X: pd.DataFrame):
         """
@@ -49,11 +60,11 @@ class LogisticRegression:
             A length m array of floats in the range [0, 1]
             with probability-like predictions
         """
-        output = []
-        for index, row in X.iterrows():
+        output = [] #Array for output
+        for index, row in X.iterrows(): #Go through every point in the input dataset
             np_row = np.append(row.to_numpy(), [-1]) #Add bias of -1
-            output.append(sigmoid(np.matmul(self.weights.transpose(), np_row))[0])
-        return np.array(output)
+            output.append(sigmoid(np.matmul(self.weights.transpose(), np_row))[0]) #multiply with weights and perfornm sigmoid function
+        return np.array(output) #Convert to numpy array
         
 
         
