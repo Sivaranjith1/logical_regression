@@ -6,12 +6,14 @@ import pandas as pd
 
 class LogisticRegression:
     
-    def __init__(self):
+    def __init__(self, lr, num_of_weights):
         # NOTE: Feel free add any hyperparameters 
         # (with defaults) as you see fit
-        pass
+        self.weights = np.random.rand(num_of_weights, 1)
+        self.lr = lr #Learning rate
+        self.num_of_weights = num_of_weights
         
-    def fit(self, X, y):
+    def fit(self, X: pd.DataFrame, y):
         """
         Estimates parameters for the classifier
         
@@ -21,10 +23,18 @@ class LogisticRegression:
             y (array<m>): a vector of floats containing 
                 m binary 0.0/1.0 labels
         """
-        # TODO: Implement
-        raise NotImplemented()
-    
-    def predict(self, X):
+        for index, row in X.iterrows():
+            np_row = row.to_numpy()
+            np_y = np.array([y[index]])
+
+            for i in range(self.num_of_weights):
+                self.weights[i] += self.lr*np.matmul((np_y - self.predict_single(row)), [np_row[i]])
+            
+            #self.weights = self.weights + self.lr*np.matmul((np_y - self.predict(row).to_numpy()), np_row)
+    def predict_single(self, X):
+        return sigmoid(np.matmul(self.weights.transpose(), X.to_numpy()))
+
+    def predict(self, X: pd.DataFrame):
         """
         Generates predictions
         
@@ -38,8 +48,10 @@ class LogisticRegression:
             A length m array of floats in the range [0, 1]
             with probability-like predictions
         """
-        # TODO: Implement
-        raise NotImplemented()
+        output = []
+        for index, row in X.iterrows():
+            output.append(sigmoid(np.matmul(self.weights.transpose(), row.to_numpy()))[0])
+        return np.array(output)
         
 
         
